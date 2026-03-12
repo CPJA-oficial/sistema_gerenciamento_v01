@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users, DollarSign, Eye, EyeOff, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { Users, DollarSign, Eye, EyeOff, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import TopBar from "@/components/TopBar";
+import PageLayout from "@/components/PageLayout";
+import Pagination from "@/components/Pagination";
 import { mockUsers, mockProducts, mockSales } from "@/data/mockData";
 
 const AdminPage = () => {
@@ -45,7 +46,7 @@ const AdminPage = () => {
     return mesVenda === filtroMes;
   });
 
-  // Pagination
+  // Pagination calculation
   const totalPaginas = Math.ceil(vendasFiltradas.length / itensPorPagina);
   const inicio = (paginaAtual - 1) * itensPorPagina;
   const fim = inicio + itensPorPagina;
@@ -68,10 +69,8 @@ const AdminPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <TopBar titulo="Administração" />
-
-      <main className="container mx-auto max-w-5xl px-4 py-8 space-y-8">
+    <PageLayout titulo="Administração">
+      <div className="space-y-8">
         {/* Stats Row */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {/* Usuários */}
@@ -251,51 +250,21 @@ const AdminPage = () => {
               </Table>
             </div>
 
-            {/* Pagination Controls */}
-            {totalPaginas > 1 && (
-              <div className="flex items-center justify-between px-6 py-4 bg-muted/10 border-t border-primary/10">
-                <p className="text-xs text-muted-foreground">
-                  Mostrando <span className="font-bold text-foreground">{vendasFiltradas.length > 0 ? inicio + 1 : 0}</span> a <span className="font-bold text-foreground">{Math.min(inicio + itensPorPagina, vendasFiltradas.length)}</span> de <span className="font-bold text-foreground">{vendasFiltradas.length}</span> vendas
-                </p>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 gap-1 px-3 border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors disabled:opacity-40"
-                    onClick={() => setPaginaAtual(p => Math.max(1, p - 1))}
-                    disabled={paginaAtual === 1}
-                  >
-                    <ChevronLeft size={14} />
-                    Anterior
-                  </Button>
-                  <div className="flex items-center gap-1.5 px-3">
-                    <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-sm">
-                      {paginaAtual}
-                    </span>
-                    <span className="text-xs text-muted-foreground">de</span>
-                    <span className="text-xs font-medium text-muted-foreground">
-                      {totalPaginas}
-                    </span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 gap-1 px-3 border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors disabled:opacity-40"
-                    onClick={() => setPaginaAtual(p => Math.min(totalPaginas, p + 1))}
-                    disabled={paginaAtual === totalPaginas}
-                  >
-                    Próximo
-                    <ChevronRight size={14} />
-                  </Button>
-                </div>
-              </div>
-            )}
+            <Pagination
+              currentPage={paginaAtual}
+              totalPages={totalPaginas}
+              onPageChange={setPaginaAtual}
+              totalItems={vendasFiltradas.length}
+              itemsPerPage={itensPorPagina}
+              label="vendas"
+            />
           </CardContent>
         </Card>
-      </main>
-    </div>
+      </div>
+    </PageLayout>
   );
 };
 
 export default AdminPage;
+
 
