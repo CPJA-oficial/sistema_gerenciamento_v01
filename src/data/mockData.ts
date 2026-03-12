@@ -30,6 +30,8 @@ export interface Sale {
   valorTotal: number;
   comprador: string;
   data: string; // ISO format or DD/MM/YYYY
+  status?: "cancelada";
+  motivoCancelamento?: string;
 }
 
 export const mockUsers: User[] = [
