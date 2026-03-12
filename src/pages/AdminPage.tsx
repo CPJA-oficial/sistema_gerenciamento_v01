@@ -29,6 +29,11 @@ const AdminPage = () => {
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 10;
 
+  // Em um sistema real, isso viria de um contexto de autenticação
+  // Para fins de demonstração, vamos definir o usuário logado aqui.
+  // Você pode trocar para "Pai", "Mãe", "Loja", etc. para testar as restrições.
+  const currentUserRole: string = "Admin"; 
+
   const totalUsuarios = mockUsers.length;
   const usuariosAtivos = mockUsers.filter((u) => u.status === "Ativo").length;
   const usuariosInativos = mockUsers.filter((u) => u.status === "Inativo").length;
@@ -147,6 +152,7 @@ const AdminPage = () => {
                     <TableHead>E-mail</TableHead>
                     <TableHead>Telefone</TableHead>
                     <TableHead>Membro desde</TableHead>
+                    <TableHead>Função</TableHead>
                     <TableHead className="text-center pr-6">Status</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -165,17 +171,43 @@ const AdminPage = () => {
                       <TableCell className="text-muted-foreground">{user.email}</TableCell>
                       <TableCell className="text-muted-foreground font-mono text-xs">{user.telefone}</TableCell>
                       <TableCell className="text-muted-foreground">{user.dataCadastro}</TableCell>
-                      <TableCell className="text-center pr-6">
-                        <Badge
-                          variant={user.status === "Ativo" ? "default" : "secondary"}
-                          className={
-                            user.status === "Ativo"
-                              ? "bg-green-500/10 text-green-600 hover:bg-green-500/20 border-green-500/20 shadow-none"
-                              : "bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/20 shadow-none"
-                          }
+                      <TableCell>
+                        <Select 
+                          defaultValue={user.role} 
+                          disabled={currentUserRole === "Pai" || currentUserRole === "Mãe"}
                         >
-                          {user.status ?? "Ativo"}
-                        </Badge>
+                          <SelectTrigger className="w-[130px] h-8 text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Filho">Filho</SelectItem>
+                            <SelectItem value="Admin">Admin</SelectItem>
+                            <SelectItem value="Pai">Pai</SelectItem>
+                            <SelectItem value="Mãe">Mãe</SelectItem>
+                            <SelectItem value="Loja">Loja</SelectItem>
+                            <SelectItem value="Lanchonete">Lanchonete</SelectItem>
+                            <SelectItem value="Ogan">Ogan</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="text-center pr-6">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={currentUserRole === "Pai" || currentUserRole === "Mãe"}
+                          className="p-0 h-auto hover:bg-transparent"
+                        >
+                          <Badge
+                            variant={user.status === "Ativo" ? "default" : "secondary"}
+                            className={
+                              user.status === "Ativo"
+                                ? "bg-green-500/10 text-green-600 hover:bg-green-500/20 border-green-500/20 shadow-none"
+                                : "bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/20 shadow-none"
+                            }
+                          >
+                            {user.status ?? "Ativo"}
+                          </Badge>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

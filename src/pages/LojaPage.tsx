@@ -20,7 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import PageLayout from "@/components/PageLayout";
 import Pagination from "@/components/Pagination";
-import { mockProducts, categorias, compradores, mockSales, type Product, type Sale } from "@/data/mockData";
+import { mockProducts, categorias, compradores, mockSales, type Product, type Sale, type Category } from "@/data/mockData";
 
 const LojaPage = () => {
   const [produtos, setProdutos] = useState<Product[]>(mockProducts);
@@ -61,10 +61,20 @@ const LojaPage = () => {
   const [cancelReason, setCancelReason] = useState("");
 
   // Cadastrar Produto state
+  const [listaCategorias, setListaCategorias] = useState<Category[]>(categorias);
   const [novoProdNome, setNovoProdNome] = useState("");
   const [novoProdCat, setNovoProdCat] = useState("");
   const [novoProdQtd, setNovoProdQtd] = useState("");
   const [novoProdValor, setNovoProdValor] = useState("");
+
+  // Nova Categoria state
+  const [catNome, setCatNome] = useState("");
+  const [catDesc, setCatDesc] = useState("");
+  const [editandoCatId, setEditandoCatId] = useState<string | null>(null);
+
+  // Deletar Categoria state
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [catToDelete, setCatToDelete] = useState<Category | null>(null);
 
   const produtoSelecionado = produtos.find((p) => p.id.toString() === vendaProduto);
   const valorTotal = produtoSelecionado ? produtoSelecionado.valor * vendaQtd : 0;
@@ -105,6 +115,61 @@ const LojaPage = () => {
     setNovoProdCat("");
     setNovoProdQtd("");
     setNovoProdValor("");
+  };
+
+  const handleNovaCategoria = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!catNome.trim()) {
+      toast.error("O nome da categoria é obrigatório.");
+      return;
+    }
+
+    if (editandoCatId) {
+      setListaCategorias((prev) =>
+        prev.map((c) =>
+          c.id === editandoCatId ? { ...c, nome: catNome, descricao: catDesc } : c
+        )
+      );
+      toast.success("Categoria atualizada com sucesso!");
+      setEditandoCatId(null);
+    } else {
+      const novaCat: Category = {
+        id: (listaCategorias.length + 1).toString(),
+        nome: catNome,
+        descricao: catDesc,
+      };
+      setListaCategorias([...listaCategorias, novaCat]);
+      toast.success("Categoria criada com sucesso!");
+    }
+    
+    setCatNome("");
+    setCatDesc("");
+  };
+
+  const handleEditarCategoria = (categoria: Category) => {
+    setEditandoCatId(categoria.id);
+    setCatNome(categoria.nome);
+    setCatDesc(categoria.descricao);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleExcluirCategoria = (categoria: Category) => {
+    setCatToDelete(categoria);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDeleteCategoria = () => {
+    if (catToDelete) {
+      setListaCategorias((prev) => prev.filter((c) => c.id !== catToDelete.id));
+      toast.success(`Categoria "${catToDelete.nome}" excluída.`);
+      if (editandoCatId === catToDelete.id) {
+        setEditandoCatId(null);
+        setCatNome("");
+        setCatDesc("");
+      }
+      setIsDeleteDialogOpen(false);
+      setCatToDelete(null);
+    }
   };
 
   const handleExcluir = (produto: Product) => {
@@ -397,6 +462,26 @@ const LojaPage = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Modal de Exclusão de Categoria */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Confirmar Exclusão</DialogTitle>
+              <DialogDescription>
+                Tem certeza que deseja excluir a categoria <strong>{catToDelete?.nome}</strong>? Esta ação não poderá ser desfeita.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button variant="destructive" onClick={handleConfirmDeleteCategoria}>
+                Confirmar Exclusão
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Cadastrar Produto */}
         <TabsContent value="cadastro">
           <Card className="shadow-sm">
@@ -414,8 +499,8 @@ const LojaPage = () => {
                   <Select value={novoProdCat} onValueChange={setNovoProdCat}>
                     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                     <SelectContent>
-                      {categorias.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      {listaCategorias.map((c) => (
+                        <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -432,6 +517,96 @@ const LojaPage = () => {
                   <Button type="submit" className="w-full">Adicionar Produto</Button>
                 </div>
               </form>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm mt-6">
+            <CardHeader>
+              <CardTitle>{editandoCatId ? "Editar Categoria" : "Nova Categoria"}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleNovaCategoria} className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Nome da Categoria</Label>
+                  <Input placeholder="Ex: Higiene" value={catNome} onChange={(e) => setCatNome(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Descrição</Label>
+                  <Input placeholder="Pequena descrição da categoria" value={catDesc} onChange={(e) => setCatDesc(e.target.value)} />
+                </div>
+                <div className="sm:col-span-2 flex gap-2">
+                  <Button type="submit" variant={editandoCatId ? "default" : "outline"} className="flex-1">
+                    {editandoCatId ? "Salvar Alterações" : "Criar Categoria"}
+                  </Button>
+                  {editandoCatId && (
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      onClick={() => {
+                        setEditandoCatId(null);
+                        setCatNome("");
+                        setCatDesc("");
+                      }}
+                    >
+                      Cancelar
+                    </Button>
+                  )}
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm mt-6">
+            <CardHeader>
+              <CardTitle>Categorias Cadastradas</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="pl-6">Nome</TableHead>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead className="text-center pr-6">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {listaCategorias.length > 0 ? (
+                    listaCategorias.map((cat) => (
+                      <TableRow key={cat.id}>
+                        <TableCell className="pl-6 font-medium">{cat.nome}</TableCell>
+                        <TableCell>{cat.descricao}</TableCell>
+                        <TableCell className="text-center pr-6">
+                          <div className="flex justify-center gap-1">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => handleEditarCategoria(cat)}
+                              title="Editar"
+                            >
+                              <Pencil size={16} />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => handleExcluirCategoria(cat)}
+                              title="Excluir"
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
+                        Nenhuma categoria cadastrada.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </TabsContent>

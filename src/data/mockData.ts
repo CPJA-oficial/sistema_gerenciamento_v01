@@ -4,6 +4,8 @@ export interface HistoricoItem {
   descricao: string;
 }
 
+export type UserRole = "Filho" | "Admin" | "Pai" | "Mãe" | "Loja" | "Lanchonete" | "Ogan";
+
 export interface User {
   id: number;
   nome: string;
@@ -13,6 +15,13 @@ export interface User {
   dataCadastro: string;
   historico: HistoricoItem[];
   status?: "Ativo" | "Inativo";
+  role: UserRole;
+}
+
+export interface Category {
+  id: string;
+  nome: string;
+  descricao: string;
 }
 
 export interface Product {
@@ -42,6 +51,7 @@ export const mockUsers: User[] = [
     telefone: "(11) 98765-4321",
     foto: "https://i.pravatar.cc/150?img=3",
     dataCadastro: "15/03/2023",
+    role: "Admin",
     historico: [
       { data: "02/03/2026", trabalho: "Gira de Preto Velho", descricao: "Auxiliar no preparo" },
       { data: "15/02/2026", trabalho: "Consulta com Caboclo", descricao: "Acompanhamento" },
@@ -68,6 +78,7 @@ export const mockUsers: User[] = [
     telefone: "(11) 91234-5678",
     foto: "https://i.pravatar.cc/150?img=7",
     dataCadastro: "09/03/2026",
+    role: "Filho",
     historico: [],
     status: "Ativo",
   },
@@ -78,6 +89,7 @@ export const mockUsers: User[] = [
     telefone: "(11) 99999-8888",
     foto: "https://i.pravatar.cc/150?img=5",
     dataCadastro: "10/01/2024",
+    role: "Filho",
     historico: [],
     status: "Inativo",
   },
@@ -91,7 +103,14 @@ export const mockProducts: Product[] = [
   { id: 5, nome: "Água de Cheiro", categoria: "Ervas", quantidade: 2, valor: 15.0 },
 ];
 
-export const categorias = ["Velas", "Ervas", "Fumo", "Imagens", "Bebidas", "Outros"];
+export const categorias: Category[] = [
+  { id: "1", nome: "Velas", descricao: "Artigos de cera para rituais e iluminação" },
+  { id: "2", nome: "Ervas", descricao: "Ervas secas e frescas para banhos e defumação" },
+  { id: "3", nome: "Fumo", descricao: "Tabacos e derivados para oferendas" },
+  { id: "4", nome: "Imagens", descricao: "Estátuas e representações de entidades" },
+  { id: "5", nome: "Bebidas", descricao: "Bebidas rituais e para oferendas" },
+  { id: "6", nome: "Outros", descricao: "Produtos diversos da loja" },
+];
 
 export const compradores = ["Maria José", "João Silva", "Ana Beatriz", "Visitante"];
 
