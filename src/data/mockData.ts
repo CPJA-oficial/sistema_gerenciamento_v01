@@ -12,6 +12,7 @@ export interface User {
   foto: string;
   dataCadastro: string;
   historico: HistoricoItem[];
+  status?: "Ativo" | "Inativo";
 }
 
 export interface Product {
@@ -35,6 +36,7 @@ export const mockUsers: User[] = [
       { data: "15/02/2026", trabalho: "Consulta com Caboclo", descricao: "Acompanhamento" },
       { data: "28/01/2026", trabalho: "Limpeza Energética", descricao: "Participação" },
     ],
+    status: "Ativo",
   },
   {
     id: 2,
@@ -44,6 +46,17 @@ export const mockUsers: User[] = [
     foto: "https://i.pravatar.cc/150?img=7",
     dataCadastro: "09/03/2026",
     historico: [],
+    status: "Ativo",
+  },
+  {
+    id: 3,
+    nome: "Ana Beatriz",
+    email: "ana@email.com",
+    telefone: "(11) 99999-8888",
+    foto: "https://i.pravatar.cc/150?img=5",
+    dataCadastro: "10/01/2024",
+    historico: [],
+    status: "Inativo",
   },
 ];
 

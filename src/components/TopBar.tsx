@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, ShoppingBag } from "lucide-react";
+import { LogOut, User, ShoppingBag, Shield } from "lucide-react";
 import { toast } from "sonner";
 import logo from "@/assets/logo.jpg";
 
@@ -47,6 +47,17 @@ const TopBar = ({ titulo }: TopBarProps) => {
           >
             <ShoppingBag size={18} />
             <span className="hidden sm:inline">Loja</span>
+          </Link>
+          <Link
+            to="/admin"
+            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              isActive("/admin")
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            <Shield size={18} />
+            <span className="hidden sm:inline">Admin</span>
           </Link>
           <button
             onClick={handleLogout}
