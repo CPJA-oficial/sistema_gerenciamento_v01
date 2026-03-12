@@ -23,6 +23,15 @@ export interface Product {
   valor: number;
 }
 
+export interface Sale {
+  id: string; // Formato: 00001-03-26
+  produto: string;
+  quantidade: number;
+  valorTotal: number;
+  comprador: string;
+  data: string; // ISO format or DD/MM/YYYY
+}
+
 export const mockUsers: User[] = [
   {
     id: 1,
@@ -71,3 +80,19 @@ export const mockProducts: Product[] = [
 export const categorias = ["Velas", "Ervas", "Fumo", "Imagens", "Bebidas", "Outros"];
 
 export const compradores = ["Maria José", "João Silva", "Ana Beatriz", "Visitante"];
+
+export const mockSales: Sale[] = [
+  { id: "00001-03-26", produto: "Vela 7 dias", quantidade: 2, valorTotal: 10.0, comprador: "Maria José", data: "02/03/2026" },
+  { id: "00002-03-26", produto: "Defumador", quantidade: 1, valorTotal: 12.0, comprador: "João Silva", data: "05/03/2026" },
+  { id: "00003-03-26", produto: "Guia de Proteção", quantidade: 1, valorTotal: 25.0, comprador: "Visitante", data: "07/03/2026" },
+  { id: "00004-03-26", produto: "Fumo de Rolo", quantidade: 2, valorTotal: 16.0, comprador: "Ana Beatriz", data: "10/03/2026" },
+  { id: "00005-03-26", produto: "Água de Cheiro", quantidade: 1, valorTotal: 15.0, comprador: "Visitante", data: "12/03/2026" },
+  { id: "00001-02-26", produto: "Vela 7 dias", quantidade: 5, valorTotal: 25.0, comprador: "Maria José", data: "15/02/2026" },
+  { id: "00002-02-26", produto: "Defumador", quantidade: 2, valorTotal: 24.0, comprador: "João Silva", data: "18/02/2026" },
+  { id: "00003-02-26", produto: "Fumo de Rolo", quantidade: 1, valorTotal: 8.0, comprador: "Visitante", data: "20/02/2026" },
+  { id: "00004-02-26", produto: "Vela 7 dias", quantidade: 3, valorTotal: 15.0, comprador: "Ana Beatriz", data: "22/02/2026" },
+  { id: "00005-02-26", produto: "Guia de Proteção", quantidade: 1, valorTotal: 25.0, comprador: "Maria José", data: "25/02/2026" },
+  { id: "00006-02-26", produto: "Defumador", quantidade: 1, valorTotal: 12.0, comprador: "Visitante", data: "28/02/2026" },
+  { id: "00001-01-26", produto: "Água de Cheiro", quantidade: 2, valorTotal: 30.0, comprador: "Ana Beatriz", data: "10/01/2026" },
+  { id: "00002-01-26", produto: "Vela 7 dias", quantidade: 1, valorTotal: 5.0, comprador: "João Silva", data: "15/01/2026" },
+];
