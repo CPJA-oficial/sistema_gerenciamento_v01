@@ -1,3 +1,10 @@
+export interface Divida {
+  id: string;
+  descricao: string;
+  valor: number;
+  data: string;
+}
+
 export interface HistoricoItem {
   data: string;
   trabalho: string;
@@ -15,7 +22,8 @@ export interface User {
   dataCadastro: string;
   historico: HistoricoItem[];
   status?: "Ativo" | "Inativo";
-  role: UserRole;
+  roles: UserRole[];
+  dividas: Divida[];
 }
 
 export interface Category {
@@ -51,7 +59,7 @@ export const mockUsers: User[] = [
     telefone: "(11) 98765-4321",
     foto: "https://i.pravatar.cc/150?img=3",
     dataCadastro: "15/03/2023",
-    role: "Admin",
+    roles: ["Admin"],
     historico: [
       { data: "02/03/2026", trabalho: "Gira de Preto Velho", descricao: "Auxiliar no preparo" },
       { data: "15/02/2026", trabalho: "Consulta com Caboclo", descricao: "Acompanhamento" },
@@ -70,6 +78,10 @@ export const mockUsers: User[] = [
       { data: "10/01/2025", trabalho: "Primeira Gira do Ano", descricao: "Abertura" },
     ],
     status: "Ativo",
+    dividas: [
+      { id: "D-001", descricao: "Mensalidade Março", valor: 50.0, data: "01/03/2026" },
+      { id: "D-002", descricao: "Uniforme", valor: 120.0, data: "15/02/2026" },
+    ],
   },
   {
     id: 2,
@@ -78,9 +90,12 @@ export const mockUsers: User[] = [
     telefone: "(11) 91234-5678",
     foto: "https://i.pravatar.cc/150?img=7",
     dataCadastro: "09/03/2026",
-    role: "Filho",
+    roles: ["Filho"],
     historico: [],
     status: "Ativo",
+    dividas: [
+      { id: "D-003", descricao: "Cantina", valor: 15.50, data: "10/03/2026" },
+    ],
   },
   {
     id: 3,
@@ -89,9 +104,10 @@ export const mockUsers: User[] = [
     telefone: "(11) 99999-8888",
     foto: "https://i.pravatar.cc/150?img=5",
     dataCadastro: "10/01/2024",
-    role: "Filho",
+    roles: ["Filho"],
     historico: [],
     status: "Inativo",
+    dividas: [],
   },
 ];
 
