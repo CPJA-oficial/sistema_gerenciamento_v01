@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Users, DollarSign, Eye, EyeOff, Calendar, UserCog, Check } from "lucide-react";
+import { 
+  Users, 
+  DollarSign, 
+  Eye, 
+  EyeOff, 
+  Calendar, 
+  UserCog, 
+  Check, 
+  CheckCircle2 
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,7 +41,7 @@ import {
 } from "@/components/ui/select";
 import PageLayout from "@/components/PageLayout";
 import Pagination from "@/components/Pagination";
-import { mockUsers, mockProducts, mockSales, type User, type UserRole } from "@/data/mockData";
+import { mockUsers, mockProducts, mockSales, type User, type UserRole, type Divida } from "@/data/mockData";
 
 const UserEditModal = ({ 
   user, 
@@ -47,14 +56,18 @@ const UserEditModal = ({
 }) => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [status, setStatus] = useState<"Ativo" | "Inativo">("Ativo");
+  const [dividas, setDividas] = useState<Divida[]>([]);
   const [paginaDividas, setPaginaDividas] = useState(1);
+  const [paginaHistorico, setPaginaHistorico] = useState(1);
   const itensPorPaginaDivida = 3;
+  const itensPorPaginaHistorico = 5;
 
   // Sync state when user changes
   useState(() => {
     if (user) {
       setRoles(user.roles);
       setStatus(user.status || "Ativo");
+      setDividas(user.dividas || []);
     }
   });
 
@@ -69,9 +82,17 @@ const UserEditModal = ({
     );
   };
 
+  const handlePayDebt = (debtId: string) => {
+    setDividas(prev => prev.filter(d => d.id !== debtId));
+  };
+
+  const handleQuitAllDebts = () => {
+    setDividas([]);
+  };
+
   const handleSave = () => {
     if (user) {
-      onSave(user.id, { roles, status });
+      onSave(user.id, { roles, status, dividas });
       onOpenChange(false);
     }
   };
@@ -198,9 +219,22 @@ const UserEditModal = ({
             {/* User Debts Section */}
             <div className="space-y-3 pt-2 border-t border-primary/10">
               <Label className="text-sm font-semibold flex items-center justify-between">
-                Dívidas do Usuário
+                <div className="flex items-center gap-2">
+                  Dívidas do Usuário
+                  {dividas.length > 0 && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={handleQuitAllDebts}
+                      className="h-6 px-2 text-[10px] bg-green-500/5 text-green-600 border-green-500/20 hover:bg-green-500/10 transition-colors"
+                    >
+                      <CheckCircle2 size={12} className="mr-1" />
+                      Quitar Tudo
+                    </Button>
+                  )}
+                </div>
                 <Badge variant="outline" className="text-[10px] bg-red-500/5 text-red-500 border-red-500/10">
-                  Total: {formatCurrency(user.dividas.reduce((acc, d) => acc + d.valor, 0))}
+                  Total: {formatCurrency(dividas.reduce((acc, d) => acc + d.valor, 0))}
                 </Badge>
               </Label>
               
@@ -210,24 +244,35 @@ const UserEditModal = ({
                     <TableRow>
                       <TableHead className="text-[10px] uppercase font-bold h-8">Descrição</TableHead>
                       <TableHead className="text-[10px] uppercase font-bold h-8 text-right">Valor</TableHead>
-                      <TableHead className="text-[10px] uppercase font-bold h-8 text-right pr-4">Data</TableHead>
+                      <TableHead className="text-[10px] uppercase font-bold h-8 text-right">Data</TableHead>
+                      <TableHead className="text-[10px] uppercase font-bold h-8 text-right pr-4">Ação</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {user.dividas.length === 0 ? (
+                    {dividas.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={3} className="text-center py-4 text-xs text-muted-foreground">
+                        <TableCell colSpan={4} className="text-center py-4 text-xs text-muted-foreground">
                           Nenhuma dívida encontrada.
                         </TableCell>
                       </TableRow>
                     ) : (
-                      user.dividas
+                      dividas
                         .slice((paginaDividas - 1) * itensPorPaginaDivida, paginaDividas * itensPorPaginaDivida)
                         .map((divida) => (
                           <TableRow key={divida.id} className="h-10 text-xs">
                             <TableCell className="py-2">{divida.descricao}</TableCell>
                             <TableCell className="py-2 text-right font-medium">{formatCurrency(divida.valor)}</TableCell>
-                            <TableCell className="py-2 text-right text-muted-foreground pr-4">{divida.data}</TableCell>
+                            <TableCell className="py-2 text-right text-muted-foreground">{divida.data}</TableCell>
+                            <TableCell className="py-2 text-right pr-4">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-green-600 hover:text-green-700 hover:bg-green-500/10"
+                                onClick={() => handlePayDebt(divida.id)}
+                              >
+                                <Check size={14} />
+                              </Button>
+                            </TableCell>
                           </TableRow>
                         ))
                     )}
@@ -235,14 +280,64 @@ const UserEditModal = ({
                 </Table>
               </div>
 
-              {user.dividas.length > itensPorPaginaDivida && (
+              {dividas.length > itensPorPaginaDivida && (
                 <Pagination
                   currentPage={paginaDividas}
-                  totalPages={Math.ceil(user.dividas.length / itensPorPaginaDivida)}
+                  totalPages={Math.ceil(dividas.length / itensPorPaginaDivida)}
                   onPageChange={setPaginaDividas}
-                  totalItems={user.dividas.length}
+                  totalItems={dividas.length}
                   itemsPerPage={itensPorPaginaDivida}
                   label="dívidas"
+                />
+              )}
+            </div>
+
+            {/* User History Section ("Minha Caminhada") */}
+            <div className="space-y-3 pt-4 border-t border-primary/10">
+              <Label className="text-sm font-semibold flex items-center gap-2">
+                <Calendar size={16} className="text-primary" />
+                Minha Caminhada
+              </Label>
+              
+              <div className="rounded-md border border-primary/10 overflow-hidden bg-muted/5">
+                <Table>
+                  <TableHeader className="bg-muted/10 h-8">
+                    <TableRow>
+                      <TableHead className="text-[10px] uppercase font-bold h-8 w-[90px]">Data</TableHead>
+                      <TableHead className="text-[10px] uppercase font-bold h-8">Trabalho</TableHead>
+                      <TableHead className="text-[10px] uppercase font-bold h-8">Descrição</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {user.historico.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={3} className="text-center py-6 text-xs text-muted-foreground italic">
+                          Nenhum registro de caminhada encontrado.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      user.historico
+                        .slice((paginaHistorico - 1) * itensPorPaginaHistorico, paginaHistorico * itensPorPaginaHistorico)
+                        .map((item, idx) => (
+                          <TableRow key={idx} className="h-10 text-[11px] hover:bg-primary/5 transition-colors">
+                            <TableCell className="py-2 font-mono text-muted-foreground">{item.data}</TableCell>
+                            <TableCell className="py-2 font-medium">{item.trabalho}</TableCell>
+                            <TableCell className="py-2 text-muted-foreground line-clamp-1">{item.descricao}</TableCell>
+                          </TableRow>
+                        ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {user.historico.length > itensPorPaginaHistorico && (
+                <Pagination
+                  currentPage={paginaHistorico}
+                  totalPages={Math.ceil(user.historico.length / itensPorPaginaHistorico)}
+                  onPageChange={setPaginaHistorico}
+                  totalItems={user.historico.length}
+                  itemsPerPage={itensPorPaginaHistorico}
+                  label="registros"
                 />
               )}
             </div>
